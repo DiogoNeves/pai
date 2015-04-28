@@ -31,25 +31,42 @@
         android:imeActionLabel="Send" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:id="@+id/inVoice"
-        android:layout_marginTop="43dp"
-        android:layout_below="@+id/inWhat"
-        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"
         android:src="@drawable/microphone"
-        android:contentDescription="@string/microphone_desc" />
+        android:contentDescription="@string/microphone_desc"
+        android:onClick="toggleListening"
+        android:layout_below="@+id/inWhat"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:id="@+id/outIntentDebug"
-        android:layout_below="@+id/inVoice"
-        android:layout_marginTop="26dp"
         android:layout_alignRight="@+id/inWhat"
         android:layout_alignEnd="@+id/inWhat"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:nestedScrollingEnabled="false"
+        android:layout_below="@+id/outSentence"
+        android:layout_marginTop="25dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/outSentence"
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/inVoice"
+        android:textStyle="bold|italic"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:textAlignment="gravity"
+        android:text="tap the button"
+        android:gravity="center_horizontal"
+        android:textSize="22sp" />
 </RelativeLayout>
