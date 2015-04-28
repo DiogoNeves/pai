@@ -26,5 +26,7 @@
         android:layout_marginStart="15dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:inputType="text" />
+        android:inputType="text"
+        android:imeOptions="actionSend"
+        android:imeActionLabel="Send" />
 </RelativeLayout>
