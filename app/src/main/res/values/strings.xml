@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pai</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="something">type something</string>
+    <string name="what">What?</string>
+</resources>
