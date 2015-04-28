@@ -18,9 +18,13 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import ai.wit.sdk.IWitListener;
 import ai.wit.sdk.Wit;
@@ -31,6 +35,7 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
 
     Wit witApi;
     TextView sentence;
+    TextView inference;
     TextView witResults;
     Gson gson;
 
@@ -44,6 +49,7 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
         witApi.enableContextLocation(getApplicationContext());
 
         sentence = (TextView) findViewById(R.id.outSentence);
+        inference = (TextView) findViewById(R.id.outInference);
 
         witResults = (TextView) findViewById(R.id.outIntentDebug);
         witResults.setMovementMethod(new ScrollingMovementMethod());
@@ -106,7 +112,43 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
         } else {
             String output = gson.toJson(witOutcomes);
             witResults.setText(output);
-            sentence.setText(witOutcomes.get(0).get_text());
+
+            WitOutcome outcome = getBestOutcome(witOutcomes);
+            sentence.setText(outcome.get_text());
+            inferAction(outcome);
+        }
+    }
+
+    private WitOutcome getBestOutcome(List<WitOutcome> outcomes) {
+        WitOutcome best = null;
+        double confidence = 0.0;
+        for (WitOutcome o : outcomes) {
+            if (o.get_confidence() > confidence) {
+                best = o;
+            }
+        }
+        return best;
+    }
+
+    private void inferAction(WitOutcome outcome) {
+        // This is where it should use proper inference to decide what to do
+        if (outcome.get_intent().equals("UNKNOWN")) {
+            inference.setText("I don't know what you mean");
+        } else {
+            StringBuilder result = new StringBuilder();
+            result.append("You want to know the ");
+            result.append(outcome.get_intent());
+
+            Map<String, JsonElement> entities = outcome.get_entities();
+            if (entities.containsKey("location")) {
+                JsonArray locations = entities.get("location").getAsJsonArray();
+                JsonElement locationElement = locations.get(0);
+
+                result.append(" in ");
+                result.append(locationElement.getAsJsonObject().get("value").getAsString());
+            }
+
+            inference.setText(result.toString());
         }
     }
 

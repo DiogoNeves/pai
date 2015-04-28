@@ -52,7 +52,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:nestedScrollingEnabled="false"
-        android:layout_below="@+id/outSentence"
+        android:layout_below="@+id/outInference"
         android:layout_marginTop="25dp" />
 
     <TextView
@@ -69,4 +69,20 @@
         android:text="tap the button"
         android:gravity="center_horizontal"
         android:textSize="22sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/outInference"
+        android:textStyle="bold|italic"
+        android:textAlignment="gravity"
+        android:gravity="center_horizontal"
+        android:textSize="22sp"
+        android:layout_below="@+id/outSentence"
+        android:layout_alignRight="@+id/inWhat"
+        android:layout_alignEnd="@+id/inWhat"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="25dp" />
 </RelativeLayout>
