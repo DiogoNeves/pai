@@ -34,4 +34,8 @@ public class ConversationState {
         log.add(intent);
         concepts.putAll(intent.data);
     }
+
+    public void setConcept(String concept, String value) {
+        concepts.put(concept, value);
+    }
 }

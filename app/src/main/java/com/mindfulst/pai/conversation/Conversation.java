@@ -15,11 +15,8 @@ public interface Conversation {
      * @param intent data to update the conversation.
      *
      * @exception ConversationException if the conversation hasn't yet started.
-     *
-     * @return true if the conversation can continue, false if the given intent doesn't match the
-     * current conversation.
      */
-    public boolean update(ConversationIntent intent);
+    public void update(ConversationIntent intent) throws ConversationException;
 
     /**
      * Checks if the conversation module has a question that needs answering before all the data is
