@@ -1,4 +1,4 @@
-package com.mindfulst.pai;
+package com.mindfulst.pai.conversation;
 
 import java.util.HashMap;
 import java.util.LinkedList;

@@ -1,4 +1,4 @@
-package com.mindfulst.pai;
+package com.mindfulst.pai.conversation;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
