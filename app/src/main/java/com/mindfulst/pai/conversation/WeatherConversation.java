@@ -5,18 +5,21 @@ package com.mindfulst.pai.conversation;
  */
 public class WeatherConversation extends AbstractConversation {
     @Override
-    protected String processUpdate() {
+    protected boolean processUpdate(ConversationIntent intent) {
         ConversationState state = getState();
 
         if (!state.hasConcept("datetime")) {
             state.setConcept("datetime", "now");
         }
 
-        String nextQuestion = null;
         if (!state.hasConcept("location")) {
-            nextQuestion = "Where?";
+            if (!intent.type.equals("weather")) {
+                return false;
+            } else {
+                setNextQuestion("Where?");
+            }
         }
 
-        return nextQuestion;
+        return true;
     }
 }

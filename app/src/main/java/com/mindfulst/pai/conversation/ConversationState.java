@@ -19,7 +19,7 @@ public class ConversationState {
     }
 
     public String getInitialIntent() {
-        return log.element().intent;
+        return log.element().type;
     }
 
     public String getConceptValue(String concept) {
@@ -37,5 +37,13 @@ public class ConversationState {
 
     public void setConcept(String concept, String value) {
         concepts.put(concept, value);
+    }
+
+    public Iterable<String> getConcepts() {
+        return concepts.keySet();
+    }
+
+    public Iterable<ConversationIntent> getLog() {
+        return new LinkedList<>(log);
     }
 }

@@ -11,25 +11,32 @@ public abstract class AbstractConversation implements Conversation {
 
     @Override
     public void start(ConversationIntent intent) {
-        state = new ConversationState(intent);
         nextQuestion = null;
+        state = new ConversationState(intent);
+        processUpdate(intent);
     }
 
     @Override
-    public void update(ConversationIntent intent) throws ConversationException {
-        if (state == null) {
-            throw new ConversationException();
-        }
+    public boolean update(ConversationIntent intent) {
+        assert state != null;
 
+        // Should happen in this order
+        nextQuestion = null;
         state.update(intent);
-        nextQuestion = processUpdate();
+        return processUpdate(intent);
     }
 
     /**
      * Internal processing of the current update.
-     * @return The next question to ask if any, null otherwise.
+     * @param intent Current intent.
+     * @return true if the update was successful, false if the intent doesn't make sense in the
+     * conversation.
      */
-    protected abstract String processUpdate();
+    protected abstract boolean processUpdate(ConversationIntent intent);
+
+    protected void setNextQuestion(String question) {
+        nextQuestion = question;
+    }
 
     @Override
     public boolean hasQuestion() {

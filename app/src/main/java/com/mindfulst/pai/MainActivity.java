@@ -7,24 +7,22 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
+import com.mindfulst.pai.conversation.Conversation;
+import com.mindfulst.pai.conversation.ConversationIntent;
+import com.mindfulst.pai.conversation.ConversationState;
+import com.mindfulst.pai.conversation.WeatherConversation;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import ai.wit.sdk.IWitListener;
 import ai.wit.sdk.Wit;
@@ -35,24 +33,32 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
 
     Wit witApi;
     TextView sentence;
-    TextView inference;
+    TextView response;
     TextView witResults;
+    TextView stateResults;
     Gson gson;
+
+    Conversation conversation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        conversation = null;
+
         final String accessToken = "W2HI75IAJB2Y5RTAPXPEDH4TEPQ6NZ6K";
         witApi = new Wit(accessToken, this);
         witApi.enableContextLocation(getApplicationContext());
 
         sentence = (TextView) findViewById(R.id.outSentence);
-        inference = (TextView) findViewById(R.id.outInference);
+        response = (TextView) findViewById(R.id.outResponse);
 
         witResults = (TextView) findViewById(R.id.outIntentDebug);
         witResults.setMovementMethod(new ScrollingMovementMethod());
+
+        stateResults = (TextView) findViewById(R.id.outStateDebug);
+        stateResults.setMovementMethod(new ScrollingMovementMethod());
 
         gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -114,14 +120,42 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
             witResults.setText(output);
 
             WitOutcome outcome = getBestOutcome(witOutcomes);
+            if (outcome == null) {
+                response.setText("That doesn't make much sense...");
+                conversation = null;
+                return;
+            }
+
             sentence.setText(outcome.get_text());
-            inferAction(outcome);
+
+            ConversationIntent intent = ConversationIntent.createFrom(outcome);
+            if (conversation == null) {
+                startConversation(intent);
+            } else {
+                final boolean canContinue = conversation.update(intent);
+                if (!canContinue) {
+                    startConversation(intent);
+                }
+            }
+
+            if (conversation != null) {
+                updateStateDebug(conversation.getState());
+
+                if (conversation.hasQuestion()) {
+                    response.setText(conversation.nextQuestion());
+                } else {
+                    response.setText("Done!");
+                    conversation = null;
+                }
+            } else {
+                response.setText("Sorry, I don't know what you mean");
+            }
         }
     }
 
     private WitOutcome getBestOutcome(List<WitOutcome> outcomes) {
         WitOutcome best = null;
-        double confidence = 0.0;
+        double confidence = 0.5;
         for (WitOutcome o : outcomes) {
             if (o.get_confidence() > confidence) {
                 best = o;
@@ -130,26 +164,31 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
         return best;
     }
 
-    private void inferAction(WitOutcome outcome) {
-        // This is where it should use proper inference to decide what to do
-        if (outcome.get_intent().equals("UNKNOWN")) {
-            inference.setText("I don't know what you mean");
-        } else {
-            StringBuilder result = new StringBuilder();
-            result.append("You want to know the ");
-            result.append(outcome.get_intent());
-
-            Map<String, JsonElement> entities = outcome.get_entities();
-            if (entities.containsKey("location")) {
-                JsonArray locations = entities.get("location").getAsJsonArray();
-                JsonElement locationElement = locations.get(0);
-
-                result.append(" in ");
-                result.append(locationElement.getAsJsonObject().get("value").getAsString());
-            }
-
-            inference.setText(result.toString());
+    private void startConversation(ConversationIntent intent) {
+        conversation = null;
+        if (intent.type.equals("weather")) {
+            conversation = new WeatherConversation();
+            conversation.start(intent);
         }
+    }
+
+    private void updateStateDebug(ConversationState state) {
+        StringBuilder output = new StringBuilder("State:");
+        output.append("\nInitial: " + state.getInitialIntent());
+
+        output.append("\nConcepts:");
+        for (String concept : state.getConcepts()) {
+            String c = String.format("\n\t%s: %s", concept, state.getConceptValue(concept));
+            output.append(c);
+        }
+
+        output.append("\nLog:");
+        for (ConversationIntent intent : state.getLog()) {
+            String i = String.format("\n\t(%s, %s)", intent.type, intent.statement);
+            output.append(i);
+        }
+
+        stateResults.setText(output.toString());
     }
 
     @Override

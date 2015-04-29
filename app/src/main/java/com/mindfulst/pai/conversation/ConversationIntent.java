@@ -1,7 +1,10 @@
 package com.mindfulst.pai.conversation;
 
+import android.util.Log;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,12 +15,12 @@ import ai.wit.sdk.model.WitOutcome;
  * Wrapper for Wit intents.
  */
 public final class ConversationIntent {
-    public final String intent;
+    public final String type;
     public final String statement;
     public final Map<String, String> data;
 
     public ConversationIntent(String intent, String statement, Map<String, String> data) {
-        this.intent = intent;
+        this.type = intent;
         this.statement = statement;
         this.data = data;
     }
@@ -33,8 +36,12 @@ public final class ConversationIntent {
             for (String k : entities.keySet()) {
                 JsonArray values = entities.get(k).getAsJsonArray();
                 if (values.size() > 0) {
-                    JsonElement valueElement = values.get(0);
-                    data.put(k, valueElement.getAsString());
+                    JsonObject valueElement = values.get(0).getAsJsonObject();
+                    try {
+                        data.put(k, valueElement.get("value").getAsString());
+                    } catch (UnsupportedOperationException e) {
+                        Log.e("Conversation", e.toString());
+                    }
                 }
             }
         }

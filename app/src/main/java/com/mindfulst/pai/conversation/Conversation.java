@@ -2,6 +2,13 @@ package com.mindfulst.pai.conversation;
 
 /**
  * Interface for conversation modules.
+ *
+ * The conversation logic should be:
+ * 1 - start or update
+ * 2 - if no question, get state and perform the action
+ * 3 - if question, get question and ask
+ * 4 - repeat all
+ *
  */
 public interface Conversation {
     /**
@@ -12,11 +19,13 @@ public interface Conversation {
 
     /**
      * Update an on-going conversation with the given intent.
+     * This can't be called before start.
      * @param intent data to update the conversation.
-     *
-     * @exception ConversationException if the conversation hasn't yet started.
+     *               
+     * @return true if the update was successful, false if the intent doesn't make sense in the
+     * conversation.
      */
-    public void update(ConversationIntent intent) throws ConversationException;
+    public boolean update(ConversationIntent intent);
 
     /**
      * Checks if the conversation module has a question that needs answering before all the data is
