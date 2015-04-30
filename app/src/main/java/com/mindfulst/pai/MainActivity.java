@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.mindfulst.pai.conversation.Conversation;
 import com.mindfulst.pai.conversation.ConversationIntent;
 import com.mindfulst.pai.conversation.ConversationState;
+import com.mindfulst.pai.conversation.TimeConversation;
 import com.mindfulst.pai.conversation.WeatherConversation;
 
 import java.io.IOException;
@@ -166,8 +167,14 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
 
     private void startConversation(ConversationIntent intent) {
         conversation = null;
+
         if (intent.type.equals("weather")) {
             conversation = new WeatherConversation();
+        } else if (intent.type.equals("time")) {
+            conversation = new TimeConversation();
+        }
+
+        if (conversation != null) {
             conversation.start(intent);
         }
     }
