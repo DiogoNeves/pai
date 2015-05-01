@@ -15,6 +15,9 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mindfulst.pai.actuators.ActionResult;
+import com.mindfulst.pai.actuators.Actuator;
+import com.mindfulst.pai.actuators.TimeActuator;
 import com.mindfulst.pai.conversation.Conversation;
 import com.mindfulst.pai.conversation.ConversationIntent;
 import com.mindfulst.pai.conversation.ConversationState;
@@ -40,6 +43,7 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
     Gson gson;
 
     Conversation conversation;
+    Actuator[] actuators;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,7 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
         setContentView(R.layout.activity_main);
 
         conversation = null;
+        actuators = new Actuator[] { new TimeActuator() };
 
         final String accessToken = "W2HI75IAJB2Y5RTAPXPEDH4TEPQ6NZ6K";
         witApi = new Wit(accessToken, this);
@@ -145,7 +150,18 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
                 if (conversation.hasQuestion()) {
                     response.setText(conversation.nextQuestion());
                 } else {
-                    response.setText("Done!");
+                    ConversationState state = conversation.getState();
+                    Actuator action = getAction(state);
+                    if (action != null) {
+                        ActionResult result = action.actOn(state);
+                        if (result != null) {
+                            response.setText(result.toString());
+                        } else {
+                            response.setText("Hum... something's fishy");
+                        }
+                    } else {
+                        response.setText("No action for this intent");
+                    }
                     conversation = null;
                 }
             } else {
@@ -177,6 +193,16 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
         if (conversation != null) {
             conversation.start(intent);
         }
+    }
+
+    private Actuator getAction(ConversationState state) {
+        for (Actuator a : actuators) {
+            if (a.canActOn(state)) {
+                return a;
+            }
+        }
+
+        return null;
     }
 
     private void updateStateDebug(ConversationState state) {
