@@ -18,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.mindfulst.pai.actuators.ActionResult;
 import com.mindfulst.pai.actuators.Actuator;
 import com.mindfulst.pai.actuators.TimeActuator;
+import com.mindfulst.pai.actuators.WeatherActuator;
 import com.mindfulst.pai.conversation.Conversation;
 import com.mindfulst.pai.conversation.ConversationIntent;
 import com.mindfulst.pai.conversation.ConversationState;
@@ -51,7 +52,7 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
         setContentView(R.layout.activity_main);
 
         conversation = null;
-        actuators = new Actuator[] { new TimeActuator() };
+        actuators = new Actuator[] { new TimeActuator(), new WeatherActuator()};
 
         final String accessToken = "W2HI75IAJB2Y5RTAPXPEDH4TEPQ6NZ6K";
         witApi = new Wit(accessToken, this);
