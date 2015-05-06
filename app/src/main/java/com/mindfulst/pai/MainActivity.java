@@ -68,23 +68,6 @@ public class MainActivity extends ActionBarActivity implements IWitListener {
         stateResults.setMovementMethod(new ScrollingMovementMethod());
 
         gson = new GsonBuilder().setPrettyPrinting().create();
-
-        TextView whatInput = (TextView) findViewById(R.id.inWhat);
-        final NotificationManager notifier =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        final int notificationId = 1;
-        whatInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                Notification simpleNotification = new NotificationCompat.Builder(v.getContext())
-                        .setSmallIcon(android.R.drawable.sym_def_app_icon)
-                        .setContentTitle("Testing")
-                        .setContentText(v.getText())
-                        .build();
-                notifier.notify(notificationId, simpleNotification);
-                return false;
-            }
-        });
     }
 
 
