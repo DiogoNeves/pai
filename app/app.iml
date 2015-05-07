@@ -93,5 +93,6 @@
     <orderEntry type="library" exported="" name="wit.sdk" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="commons-io-2.4" level="project" />
+    <orderEntry type="library" exported="" name="rsbot" level="project" />
   </component>
 </module>
