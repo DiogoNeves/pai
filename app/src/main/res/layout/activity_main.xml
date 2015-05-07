@@ -5,69 +5,36 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <ImageButton
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:id="@+id/inVoice"
-        android:layout_marginTop="25dp"
-        android:src="@drawable/microphone"
-        android:contentDescription="@string/microphone_desc"
-        android:onClick="toggleListening"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
+    <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/outIntentDebug"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:id="@+id/inWhat"
         android:layout_alignParentBottom="true"
-        android:nestedScrollingEnabled="false"
-        android:layout_below="@+id/outResponse"
-        android:layout_marginTop="25dp"
-        android:layout_toStartOf="@+id/inVoice"
-        android:layout_toLeftOf="@+id/inVoice"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/outSentence"
-        android:layout_marginTop="27dp"
-        android:layout_below="@+id/inVoice"
-        android:textStyle="bold|italic"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:textAlignment="gravity"
-        android:text="tap the button"
-        android:gravity="center_horizontal"
-        android:textSize="22sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/outResponse"
-        android:textStyle="bold|italic"
-        android:textAlignment="gravity"
-        android:gravity="center_horizontal"
-        android:textSize="22sp"
-        android:layout_below="@+id/outSentence"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="25dp"
-        android:layout_alignRight="@+id/outSentence"/>
+        android:layout_toLeftOf="@+id/btnSend"
+        android:layout_toStartOf="@+id/btnSend"
+        android:inputType="text"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/send_button"
+        android:id="@+id/btnSend"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/outStateDebug"
-        android:nestedScrollingEnabled="false"
-        android:layout_alignTop="@+id/outIntentDebug"
-        android:layout_alignBottom="@+id/outIntentDebug"
-        android:layout_toEndOf="@+id/outIntentDebug"
-        android:layout_toLeftOf="@+id/outIntentDebug"
-        android:layout_alignRight="@+id/outSentence"/>
+        android:id="@+id/outConversation"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/btnSend"
+        android:layout_alignRight="@+id/btnSend"
+        android:layout_alignEnd="@+id/btnSend"/>
+
 </RelativeLayout>
