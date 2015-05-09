@@ -1,31 +1,35 @@
 package com.mindfulst.pai;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rivescript.RiveScript;
-
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Locale;
 
 
 public class MainActivity extends ActionBarActivity {
 
-    RiveScript scriptEngine;
+    private static final int SPEECH_ACTIVITY_ID = 100;
 
-    TextView conversation;
-    TextView userSentence;
+    private RiveScript scriptEngine;
+    private TextView conversation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,16 +37,21 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         scriptEngine = new RiveScript(false);
-        scriptEngine.setHandler("perl", new com.rivescript.lang.Perl(scriptEngine,
-                "assets/lang/rsp4j.pl"));
+        scriptEngine.setHandler("perl", new com.rivescript.lang.Perl(
+                scriptEngine, "assets/lang/rsp4j.pl"));
 
         tryLoadScripts();
 
         conversation = (TextView) findViewById(R.id.outConversation);
-        userSentence = (TextView) findViewById(R.id.inUserSentence);
 
-        final Button sendButton = (Button) findViewById(R.id.sendButton);
-        sendButton.setOnClickListener(new SendButtonListener());
+        final ImageButton speakButton =
+                (ImageButton) findViewById(R.id.speakButton);
+        speakButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promptSpeechInput();
+            }
+        });
     }
 
     private void tryLoadScripts() {
@@ -86,6 +95,40 @@ public class MainActivity extends ActionBarActivity {
         scriptEngine.stream(content.toString());
     }
 
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak");
+
+        try {
+            startActivityForResult(intent, SPEECH_ACTIVITY_ID);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(), "Not supported",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SPEECH_ACTIVITY_ID && data != null) {
+                final ArrayList<String> speechResult =
+                        data.getStringArrayListExtra(
+                                RecognizerIntent.EXTRA_RESULTS);
+                final String sentence = speechResult.get(0);
+                final String reply = scriptEngine.reply("localuser", sentence);
+
+                conversation.append(String.format("you> %s\n", sentence));
+                conversation.append(String.format("bot> %s\n", reply));
+            }
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -106,17 +149,5 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public class SendButtonListener implements View.OnClickListener {
-        public void onClick(View v) {
-            if (userSentence.getText().length() > 0) {
-                final String sentence = userSentence.getText().toString();
-                final String reply = scriptEngine.reply("localuser", sentence);
-
-                conversation.append(String.format("you> %s\n", sentence));
-                conversation.append(String.format("bot> %s\n", reply));
-            }
-        }
     }
 }
