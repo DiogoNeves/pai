@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -31,8 +32,11 @@ import java.util.Locale;
 public class MainActivity extends ActionBarActivity {
 
     private static final int SPEECH_ACTIVITY_ID = 100;
+    private static final String UTTERANCE_ID = "speaker";
 
     private RiveScript scriptEngine;
+    private TextToSpeech speaker;
+
     private TextView conversation;
     private EditText userSentenceInput;
 
@@ -44,28 +48,43 @@ public class MainActivity extends ActionBarActivity {
         scriptEngine = new RiveScript(false);
         scriptEngine.setHandler("perl", new com.rivescript.lang.Perl(
                 scriptEngine, "assets/lang/rsp4j.pl"));
-
         tryLoadScripts();
+
+        speaker = new TextToSpeech(getApplicationContext(),
+                new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(int status) {
+                        if (status != TextToSpeech.ERROR) {
+                            speaker.setLanguage(Locale.UK);
+                        } else {
+                            Toast.makeText(getApplicationContext(),
+                                    "TextToSpeech failed",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
 
         conversation = (TextView) findViewById(R.id.outConversation);
         userSentenceInput = (EditText) findViewById(R.id.userSentenceBox);
 
         userSentenceInput.setOnEditorActionListener(
                 new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId,
-                                          KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEND ||
-                        (event.getAction() == KeyEvent.ACTION_DOWN &&
-                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                    processUserSentence();
-                    userSentenceInput.getText().clear();
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
+                    @Override
+                    public boolean onEditorAction(TextView v, int actionId,
+                                                  KeyEvent event) {
+                        final boolean isSend = actionId == EditorInfo.IME_ACTION_SEND;
+                        final boolean isReturn =
+                                event.getAction() == KeyEvent.ACTION_DOWN &&
+                                        event.getKeyCode() == KeyEvent.KEYCODE_ENTER;
+                        if (isSend || isReturn) {
+                            processUserSentence();
+                            userSentenceInput.getText().clear();
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
 
         final Button sendButton = (Button) findViewById(R.id.sendButton);
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -83,6 +102,15 @@ public class MainActivity extends ActionBarActivity {
                 promptSpeechInput();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (speaker != null) {
+            speaker.stop();
+            speaker.shutdown();
+        }
+        super.onDestroy();
     }
 
     private void tryLoadScripts() {
@@ -167,6 +195,7 @@ public class MainActivity extends ActionBarActivity {
             final String reply = scriptEngine.reply("localuser", sentence);
             conversation.append(String.format("you> %s\n", sentence));
             conversation.append(String.format("bot> %s\n", reply));
+            speaker.speak(reply, TextToSpeech.QUEUE_FLUSH, null, UTTERANCE_ID);
         }
     }
 
