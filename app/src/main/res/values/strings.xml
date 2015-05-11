@@ -3,4 +3,6 @@
 
     <string name="action_settings">Settings</string>
     <string name="send_button"><![CDATA[>]]></string>
+    <string name="microphone">microphone</string>
+    <string name="send">send</string>
 </resources>

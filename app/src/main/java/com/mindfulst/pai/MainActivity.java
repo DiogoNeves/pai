@@ -7,9 +7,13 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +34,7 @@ public class MainActivity extends ActionBarActivity {
 
     private RiveScript scriptEngine;
     private TextView conversation;
+    private EditText userSentenceInput;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,32 @@ public class MainActivity extends ActionBarActivity {
         tryLoadScripts();
 
         conversation = (TextView) findViewById(R.id.outConversation);
+        userSentenceInput = (EditText) findViewById(R.id.userSentenceBox);
+
+        userSentenceInput.setOnEditorActionListener(
+                new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,
+                                          KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND ||
+                        (event.getAction() == KeyEvent.ACTION_DOWN &&
+                                event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                    processUserSentence();
+                    userSentenceInput.getText().clear();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+
+        final Button sendButton = (Button) findViewById(R.id.sendButton);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                processUserSentence();
+            }
+        });
 
         final ImageButton speakButton =
                 (ImageButton) findViewById(R.id.speakButton);
@@ -63,7 +94,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void loadScripts() throws IOException {
-        final String directory = "Aiden";
+        final String directory = "scripts";
 
         AssetManager assets = getAssets();
         for (String filename : assets.list(directory)) {
@@ -95,6 +126,11 @@ public class MainActivity extends ActionBarActivity {
         scriptEngine.stream(content.toString());
     }
 
+    private void processUserSentence() {
+        String sentence = userSentenceInput.getText().toString();
+        processReply(sentence);
+    }
+
     private void promptSpeechInput() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -121,11 +157,16 @@ public class MainActivity extends ActionBarActivity {
                         data.getStringArrayListExtra(
                                 RecognizerIntent.EXTRA_RESULTS);
                 final String sentence = speechResult.get(0);
-                final String reply = scriptEngine.reply("localuser", sentence);
-
-                conversation.append(String.format("you> %s\n", sentence));
-                conversation.append(String.format("bot> %s\n", reply));
+                processReply(sentence);
             }
+        }
+    }
+
+    private void processReply(final String sentence) {
+        if (!"".equals(sentence)) {
+            final String reply = scriptEngine.reply("localuser", sentence);
+            conversation.append(String.format("you> %s\n", sentence));
+            conversation.append(String.format("bot> %s\n", reply));
         }
     }
 
