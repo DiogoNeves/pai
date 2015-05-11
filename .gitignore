@@ -29,4 +29,5 @@ proguard/
 # Android Studio files
 /.idea/workspace.xml
 /.idea/libraries
+/.idea/dictionaries
 .DS_Store
