@@ -6,7 +6,7 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
     private static final int SPEECH_ACTIVITY_ID = 100;
     private static final String UTTERANCE_ID = "speaker";
@@ -150,7 +150,7 @@ public class MainActivity extends ActionBarActivity {
 
         reader.close();
         streamReader.close();
-        
+
         scriptEngine.stream(content.toString());
     }
 
