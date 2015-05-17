@@ -150,7 +150,7 @@ public class MainActivity extends ActionBarActivity {
 
         reader.close();
         streamReader.close();
-
+        
         scriptEngine.stream(content.toString());
     }
 

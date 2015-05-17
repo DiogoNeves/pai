@@ -1,0 +1,20 @@
+// Ask questions about the weather
+
++ how's the weather like?
+- where?
+
++ how's the weather like in *?
+- It's rainy in <star>
+
++ how's the weather like here?
+* <get location> ne undefined => It's cloudy in <get location>
+- where are you at the moment?
+
++ *
+% where?
+- It's sunny in <star>
+- It's ok in <star>
+
++ *
+% where are you at the moment?
+- <set location=<formal>>It's bloody hot in <get location>!
