@@ -1,6 +1,6 @@
 // Ask questions about the weather
 
-+ how's the weather like?
++ how's the weather like?{weight=100}
 - where?
 
 + how's the weather like in *?

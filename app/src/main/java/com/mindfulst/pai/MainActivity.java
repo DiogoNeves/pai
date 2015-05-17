@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scriptEngine = new RiveScript(false);
+        scriptEngine = new RiveScript(true);
         scriptEngine.setHandler("perl", new com.rivescript.lang.Perl(
                 scriptEngine, "assets/lang/rsp4j.pl"));
         tryLoadScripts();
@@ -133,6 +133,8 @@ public class MainActivity extends AppCompatActivity {
             loadScript(scriptStream);
             scriptStream.close();
         }
+        Log.d("conversation", scriptEngine.getTopicsString());
+        Log.d("conversation", scriptEngine.getSortedString());
         scriptEngine.sortReplies();
     }
 
