@@ -2,12 +2,10 @@ package com.mindfulst.pai;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,12 +17,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.rivescript.RiveScript;
+import com.mindfulst.pai.scripting.AndroidRiveScript;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -34,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int SPEECH_ACTIVITY_ID = 100;
     private static final String UTTERANCE_ID = "speaker";
 
-    private RiveScript scriptEngine;
+    private AndroidRiveScript scriptEngine;
     private TextToSpeech speaker;
 
     private TextView conversation;
@@ -45,10 +39,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scriptEngine = new RiveScript(true);
+        scriptEngine = new AndroidRiveScript(this, true);
         scriptEngine.setHandler("perl", new com.rivescript.lang.Perl(
                 scriptEngine, "assets/lang/rsp4j.pl"));
-        tryLoadScripts();
+
+        scriptEngine.loadDirectory("scripts");
+        scriptEngine.sortReplies();
 
         speaker = new TextToSpeech(getApplicationContext(),
                 new TextToSpeech.OnInitListener() {
@@ -111,49 +107,6 @@ public class MainActivity extends AppCompatActivity {
             speaker.shutdown();
         }
         super.onDestroy();
-    }
-
-    private void tryLoadScripts() {
-        try {
-            loadScripts();
-        } catch (IOException e) {
-            Log.e("conversation", "Failed to load scripts directory");
-        }
-    }
-
-    private void loadScripts() throws IOException {
-        final String directory = "scripts";
-
-        AssetManager assets = getAssets();
-        for (String filename : assets.list(directory)) {
-            Log.d("conversation", "Loading " + filename);
-
-            final String path = String.format("%s/%s", directory, filename);
-            InputStream scriptStream = assets.open(path);
-            loadScript(scriptStream);
-            scriptStream.close();
-        }
-        Log.d("conversation", scriptEngine.getTopicsString());
-        Log.d("conversation", scriptEngine.getSortedString());
-        scriptEngine.sortReplies();
-    }
-
-    private void loadScript(InputStream stream) throws IOException {
-        InputStreamReader streamReader = new InputStreamReader(stream);
-        BufferedReader reader = new BufferedReader(streamReader);
-
-        StringBuilder content = new StringBuilder();
-        String line = reader.readLine();
-        while (line != null) {
-            content.append(line);
-            content.append("\n");
-            line = reader.readLine();
-        }
-
-        reader.close();
-        streamReader.close();
-
-        scriptEngine.stream(content.toString());
     }
 
     private void processUserSentence() {
