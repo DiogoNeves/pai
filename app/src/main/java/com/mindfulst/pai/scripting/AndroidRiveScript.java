@@ -108,15 +108,12 @@ public class AndroidRiveScript extends RiveScript {
         BufferedReader reader = new BufferedReader(streamReader);
 
         Vector<String> lines = new Vector<>();
-        String line = reader.readLine();
-        while (line != null) {
+        String line;
+        while ((line = reader.readLine()) != null) {
             lines.add(line);
-            line = reader.readLine();
         }
 
         reader.close();
-        streamReader.close();
-        fileStream.close();
 
         String[] code = com.rivescript.Util.Sv2s(lines);
         return parse(path, code);
